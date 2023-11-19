@@ -16,9 +16,10 @@ let swiftSettings: [SwiftSetting] = [
 let package = Package(
     name: "SimpleKeychain",
     platforms: [
-        .iOS(.v17),
+        .iOS(.v15),
         .watchOS(.v9),
-        .macOS(.v13)
+        .macOS(.v13),
+        .tvOS(.v15)
     ],
     products: [
         // Products define the executables and libraries a package produces, making them visible to other packages.
