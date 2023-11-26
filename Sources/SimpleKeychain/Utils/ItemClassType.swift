@@ -7,7 +7,7 @@
 
 import Foundation
 
-public enum ItemClassType: RawRepresentable {
+public enum ItemClassType: RawRepresentable, Sendable {
     public typealias RawValue = CFString
 
     case generic

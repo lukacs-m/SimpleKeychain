@@ -12,3 +12,5 @@ extension CFString {
         self as String
     }
 }
+
+extension CFString: @unchecked Sendable {}
