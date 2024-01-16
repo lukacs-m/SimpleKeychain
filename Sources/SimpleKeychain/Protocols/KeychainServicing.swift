@@ -15,6 +15,7 @@ public protocol KeychainServicing {
              ofType itemClassType: ItemClassType,
              with access: KeychainAccessOptions,
              attributes: [CFString: any Sendable]?) async throws
+    func delete(_ key: String, ofType itemClassType: ItemClassType) async throws
     func clear(ofType itemClassType: ItemClassType) async throws
 }
 
@@ -30,6 +31,10 @@ extension KeychainServicing {
              with access: KeychainAccessOptions = .default,
              attributes: [CFString: any Sendable]? = nil) async throws {
         try await set(item, for: key, ofType: itemClassType, with: access, attributes: attributes)
+    }
+
+    func delete(_ key: String, ofType itemClassType: ItemClassType = .generic) async throws {
+        try await delete(key, ofType: itemClassType)
     }
 
     func clear(ofType itemClassType: ItemClassType = .generic) async throws {

@@ -58,6 +58,20 @@ public actor SimpleKeychain: KeychainServicing {
         }
     }
 
+    public func delete(_ key: String, ofType itemClassType: ItemClassType = .generic) throws {
+        let query = createQuery(for: key, ofType: itemClassType)
+        let result = SecItemDelete(query as CFDictionary)
+        if result != errSecSuccess {
+            let error = result.toSimpleKeychainError
+            switch error {
+            case .itemNotFound:
+                break
+            default:
+                throw error
+            }
+        }
+    }
+
     public func clear(ofType itemClassType: ItemClassType = .generic) throws {
         var query: [CFString: Any] = [kSecClass: itemClassType.rawValue ]
         if let accessGroup {
@@ -99,20 +113,6 @@ private extension SimpleKeychain {
         let result = SecItemAdd(query as CFDictionary, nil)
         if result != errSecSuccess {
             throw result.toSimpleKeychainError
-        }
-    }
-
-    func delete(_ key: String, ofType itemClassType: ItemClassType = .generic) throws {
-        let query = createQuery(for: key, ofType: itemClassType)
-        let result = SecItemDelete(query as CFDictionary)
-        if result != errSecSuccess {
-            let error = result.toSimpleKeychainError
-            switch error {
-            case .itemNotFound:
-                break
-            default:
-                throw error
-            }
         }
     }
 

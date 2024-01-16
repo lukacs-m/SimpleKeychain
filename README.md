@@ -45,6 +45,8 @@ let retrievedItem: String = try keychain.get(key: "YourKey")
 ```swift
 // Delete a specific item
 try keychain.delete("YourKey")
+// Or alternatively set a nil value
+try keychain.set(nil, for: "YourKey")
 
 // Clear all items of a specific class type
 try keychain.clear(ofType: .generic)
