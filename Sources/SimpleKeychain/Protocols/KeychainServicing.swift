@@ -9,8 +9,8 @@ import Foundation
 
 public protocol KeychainServicing {
     @discardableResult
-    func get<T: Decodable & Sendable>(key: String, ofType itemClassType: ItemClassType) async throws -> T
-    func set<T: Encodable & Sendable>(_ item: T,
+    func get<T: Decodable & Sendable>(key: String, ofType itemClassType: ItemClassType) async throws -> T?
+    func set<T: Encodable & Sendable>(_ item: T?,
              for key: String,
              ofType itemClassType: ItemClassType,
              with access: KeychainAccessOptions,
@@ -21,11 +21,11 @@ public protocol KeychainServicing {
 
 extension KeychainServicing {
     @discardableResult
-    func get<T: Decodable & Sendable>(key: String, ofType itemClassType: ItemClassType = .generic) async throws -> T {
+    func get<T: Decodable & Sendable>(key: String, ofType itemClassType: ItemClassType = .generic) async throws -> T? {
        try await get(key: key, ofType: itemClassType)
     }
 
-    func set<T: Encodable & Sendable>(_ item: T,
+    func set<T: Encodable & Sendable>(_ item: T?,
              for key: String,
              ofType itemClassType: ItemClassType = .generic,
              with access: KeychainAccessOptions = .default,

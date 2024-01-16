@@ -14,7 +14,7 @@ public actor SimpleKeychain: KeychainServicing {
     }
 
     @discardableResult
-    public func get<T: Decodable & Sendable>(key: String, ofType itemClassType: ItemClassType = .generic) throws -> T {
+    public func get<T: Decodable & Sendable>(key: String, ofType itemClassType: ItemClassType = .generic) throws -> T? {
         var query = createQuery(for: key, ofType: itemClassType)
         query[kSecMatchLimit] = kSecMatchLimitOne
         query[kSecReturnAttributes] = kCFBooleanTrue
@@ -23,7 +23,13 @@ public actor SimpleKeychain: KeychainServicing {
         var item: CFTypeRef?
         let result = SecItemCopyMatching(query as CFDictionary, &item)
         if result != errSecSuccess {
-            throw result.toSimpleKeychainError
+            let error = result.toSimpleKeychainError
+            switch error {
+            case .itemNotFound:
+                return nil
+            default:
+                throw error
+            }
         }
 
         guard let keychainItem = item as? [CFString: Any],
@@ -34,11 +40,15 @@ public actor SimpleKeychain: KeychainServicing {
         return try JSONDecoder().decode(T.self, from: data)
     }
 
-    public func set<T: Encodable & Sendable>(_ item: T,
+    public func set<T: Encodable & Sendable>(_ item: T?,
                                              for key: String,
                                              ofType itemClassType: ItemClassType = .generic,
                                              with access: KeychainAccessOptions = .default,
                                              attributes: [CFString: any Sendable]? = nil) throws {
+        guard let item else {
+            try delete(key, ofType: itemClassType)
+            return
+        }
         let data = try JSONEncoder().encode(item)
 
         do {
@@ -50,10 +60,15 @@ public actor SimpleKeychain: KeychainServicing {
 
     public func delete(_ key: String, ofType itemClassType: ItemClassType = .generic) throws {
         let query = createQuery(for: key, ofType: itemClassType)
-
         let result = SecItemDelete(query as CFDictionary)
         if result != errSecSuccess {
-            throw result.toSimpleKeychainError
+            let error = result.toSimpleKeychainError
+            switch error {
+            case .itemNotFound:
+                break
+            default:
+                throw error
+            }
         }
     }
 
@@ -110,6 +125,7 @@ private extension SimpleKeychain {
         query[kSecClass] = itemClassType.rawValue
         query[kSecAttrAccount] = key
         query[kSecAttrAccessible] = access.value
+        query[kSecUseDataProtectionKeychain] = kCFBooleanTrue
 
         if let data {
             query[kSecValueData] = data
@@ -132,4 +148,3 @@ private extension SimpleKeychain {
         return query
     }
 }
-
