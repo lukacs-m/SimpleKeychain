@@ -16,9 +16,9 @@ let swiftSettings: [SwiftSetting] = [
 let package = Package(
     name: "SimpleKeychain",
     platforms: [
-        .iOS(.v15),
+        .iOS(.v13),
         .watchOS(.v9),
-        .macOS(.v13),
+        .macOS(.v12),
         .tvOS(.v15)
     ],
     products: [
