@@ -7,7 +7,7 @@
 
 import Foundation
 
-public protocol KeychainServicing {
+public protocol KeychainServicing: Sendable {
     @discardableResult
     func get<T: Decodable & Sendable>(key: String, ofType itemClassType: ItemClassType) async throws -> T?
     func set<T: Encodable & Sendable>(_ item: T?,
